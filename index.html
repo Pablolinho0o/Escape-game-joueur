@@ -11,9 +11,12 @@ body{
     font-family:Georgia, serif;
     text-align:center;
     color:white;
-    background: url('https://images.unsplash.com/photo-1603481540822-df0409c2adf6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4fDB8MHwxfGFsbHwxfHx2ZW5ldGlhJTIwbWFza3xlbnwwfHx8fDE2OTg3MzY1ODF&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center fixed;
+    /* Fond Carnaval stable */
+    background: url('https://wallpaper.forfun.com/fetch/7f/7f5187b02300cf63188af2393bf45f5f.jpeg') no-repeat center center fixed;
     background-size: cover;
     overflow:hidden;
+}
+ow:hidden;
 }
 
 /* BOITE DE JEU */
@@ -107,9 +110,15 @@ input{
 <script>
 // 🔥 ENIGMES
 let enigmes = [
-    {q:"Accessoire emblématique du carnaval ?", r:"MASQUE"},
-    {q:"Ville du célèbre carnaval ?", r:"VENISE"},
-    {q:"Moment magique où tout disparaît ?", r:"MINUIT"}
+    {
+        q:"🔎 Quel mot est représenté par ce rébus ?<br>" +
+          "<img src='https://upload.wikimedia.org/wikipedia/commons/1/19/Letter_V.png' width='40'>" +
+          "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Ninja.svg/64px-Ninja.svg.png' width='40'>" +
+          "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Serpent_icon.svg/64px-Serpent_icon.svg.png' width='40'>",
+        r:"VENISE"
+    },
+    {q:"Ville du célèbre carnaval ?", r:"1"},
+    {q:"Moment magique où tout disparaît ?", r:"1"}
 ];
 enigmes.sort(()=>Math.random()-0.5);
 
@@ -209,14 +218,6 @@ function randomStress(){
         setTimeout(()=>{document.body.classList.remove("glitch");},200);
     }
 }
-
-// Mode maître du jeu (touche M)
-document.addEventListener("keydown",function(e){
-    if(e.key==="m"){
-        alert("😈 Mode Maître du Jeu activé");
-        finish();
-    }
-});
 </script>
 </body>
 </html>
