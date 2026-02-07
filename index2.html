@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carnaval Mystérieux Pro</title>
+
+<style>
+body{
+margin:0;
+font-family:Georgia, serif;
+text-align:center;
+color:white;
+background:url('images/fond.png') no-repeat center center fixed;
+background-size:cover;
+overflow:hidden;
+}
+
+#box{
+background:rgba(0,0,0,0.45);
+padding:20px;
+border-radius:15px;
+max-width:500px;
+margin:auto;
+margin-top:20px;
+backdrop-filter:blur(6px);
+}
+
+button{
+background:gold;
+border:none;
+padding:12px;
+width:100%;
+font-size:18px;
+margin-top:10px;
+border-radius:10px;
+font-weight:bold;
+}
+
+input{
+padding:10px;
+font-size:18px;
+width:100%;
+border-radius:10px;
+border:none;
+margin-top:10px;
+}
+
+#chrono{
+font-size:28px;
+text-shadow:0 0 10px gold;
+}
+
+#mask{
+width:120px;
+margin:auto;
+animation:floatMask 3s ease-in-out infinite;
+}
+
+@keyframes floatMask{
+0%{transform:translateY(0);}
+50%{transform:translateY(-10px);}
+100%{transform:translateY(0);}
+}
+
+@keyframes glitch{
+0%{transform:translate(0);}
+20%{transform:translate(-2px,2px);}
+40%{transform:translate(2px,-2px);}
+60%{transform:translate(-1px,1px);}
+80%{transform:translate(1px,-1px);}
+100%{transform:translate(0);}
+}
+
+.glitch{animation:glitch 0.2s;}
+</style>
+</head>
+
+<body>
+
+<h1>🎭 Carnaval Mystérieux 🎭</h1>
+
+<img id="mask" src="images/Masque.png">
+
+<div id="start">
+<input id="teamName" placeholder="Nom de l'équipe">
+<button onclick="start()">Entrer au Bal</button>
+</div>
+
+<div id="game" style="display:none;">
+<h2 id="chrono">00:00</h2>
+<div id="box">
+<p id="question"></p>
+<input id="rep" placeholder="Mot secret">
+<button onclick="check()">Valider</button>
+<p id="msg"></p>
+</div>
+</div>
+
+<audio id="music" loop>
+<source src="https://cdn.pixabay.com/audio/2022/10/13/audio_39b6ff92bb.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+// ==========================
+// ENIGMES ALEATOIRES
+// ==========================
+
+let enigmes = [
+
+{
+q:`🔎 Quel mot est représenté par ce rébus ?<br>
+<img src="images/E2.png" width="300">`,
+r:"AUDREY FLEUROT"
+},
+
+{q:"Trouvez le mot cacher dans cette phrase : Grandir ou Avancer, Nuisible de Tarentule Spectrale", r:"GANTS"},
+
+{q:"Est tu assez vieux pour reconnaitre :822226667777 ", r:"TACOS"},
+
+{q:"? nosiam ettec ed ehcom sulp al tse iuQ ", r:"VINCENT"},
+
+{q:"Il a une arête, et une aile de chaque côté. Comparé à une trompette, qui n'est pas forcément bouchée. Que suis-je ?", r:"LE NEZ"},
+
+{q:"C'était généralement le 12e jour du mois de pluviôse dans le calendrier républicain / révolutionnaire français, officiellement dénommé jour du brocoli. Tous cela dans une année commune qui commence un samedi. Quel date je suis ?", r:"31/01/1994"}
+
+];
+
+// 🔥 mélange aléatoire
+enigmes.sort(()=>Math.random()-0.5);
+
+
+// ==========================
+// ENIGME FINALE (TOUJOURS A LA FIN)
+// ==========================
+
+let enigmeFinale = {
+q:"🎯 Enigme finale : réussir le challenge bière pong",
+r:"DARIO"
+};
+
+
+// ==========================
+// VARIABLES
+// ==========================
+
+let sec=0,timer,index=0,equipe="";
+
+
+// ==========================
+// START GAME
+// ==========================
+
+function start(){
+
+equipe=document.getElementById("teamName").value;
+
+if(!equipe){
+alert("Entrez un nom d'équipe");
+return;
+}
+
+let music=document.getElementById("music");
+music.muted=true;
+music.play().then(()=>{music.muted=false;}).catch(()=>{});
+
+document.getElementById("start").style.display="none";
+document.getElementById("game").style.display="block";
+
+let prog=JSON.parse(localStorage.getItem("escapeProgress")||"{}");
+
+if(prog[equipe]){
+index=prog[equipe].index;
+sec=prog[equipe].sec;
+}
+
+load();
+
+timer=setInterval(()=>{
+
+sec++;
+updateChrono();
+randomStress();
+
+let p=JSON.parse(localStorage.getItem("escapeProgress")||"{}");
+p[equipe]={index:index,sec:sec};
+localStorage.setItem("escapeProgress",JSON.stringify(p));
+
+},1000);
+}
+
+
+// ==========================
+// CHRONO
+// ==========================
+
+function updateChrono(){
+
+let m=Math.floor(sec/60),s=sec%60;
+
+document.getElementById("chrono").textContent=
+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+
+}
+
+
+// ==========================
+// LOAD ENIGME
+// ==========================
+
+function load(){
+
+if(index < enigmes.length){
+
+document.getElementById("question").innerHTML=enigmes[index].q;
+
+}else{
+
+// toujours afficher finale en dernier
+document.getElementById("question").innerHTML=enigmeFinale.q;
+
+}
+
+document.getElementById("rep").value="";
+document.getElementById("msg").textContent="";
+
+}
+
+
+// ==========================
+// VERIFIER REPONSE
+// ==========================
+
+function check(){
+
+let rep=document.getElementById("rep").value.toUpperCase();
+
+let bonneRep;
+
+if(index < enigmes.length){
+bonneRep=enigmes[index].r;
+}else{
+bonneRep=enigmeFinale.r;
+}
+
+if(rep===bonneRep){
+
+index++;
+
+if(index <= enigmes.length){
+
+load();
+
+}else{
+
+finish();
+
+}
+
+}else{
+
+document.getElementById("msg").textContent="❌ Mauvaise réponse";
+document.body.classList.add("glitch");
+setTimeout(()=>{document.body.classList.remove("glitch");},200);
+
+}
+
+}
+
+
+// ==========================
+// FIN DU JEU
+// ==========================
+
+function finish(){
+
+clearInterval(timer);
+
+let temps=document.getElementById("chrono").textContent;
+
+let results=JSON.parse(localStorage.getItem("escapeResults")||"[]");
+
+results.push({team:equipe,time:temps});
+
+localStorage.setItem("escapeResults",JSON.stringify(results));
+
+document.body.innerHTML=`
+<h1>🎭 Mystère terminé !</h1>
+<p>Temps final : ${temps}</p>
+<p>Équipe : ${equipe}</p>
+<p>Attendez l'annonce du Maître du Jeu</p>
+`;
+
+}
+
+
+// ==========================
+// FAUX STRESS VISUEL
+// ==========================
+
+function randomStress(){
+
+if(Math.random()<0.15){
+
+document.body.classList.add("glitch");
+
+setTimeout(()=>{document.body.classList.remove("glitch");},200);
+
+}
+
+}
+
+</script>
+</body>
+</html>
