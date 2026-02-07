@@ -1,163 +1,254 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carnaval Mystérieux Pro</title>
+
 <style>
-
 body{
-background:linear-gradient(135deg,#2b0a3d,#6b1e4d,#b58a2c);
-color:white;
-font-family:Georgia;
-text-align:center;
+    margin:0;
+    font-family:Georgia, serif;
+    text-align:center;
+    color:white;
+    background: url('https://images.unsplash.com/photo-1603481540822-df0409c2adf6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4fDB8MHwxfGFsbHwxfHx2ZW5ldGlhJTIwbWFza3xlbnwwfHx8fDE2OTg3MzY1ODF&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center fixed;
+    background-size: cover;
+    overflow:hidden;
 }
 
+/* RIDEAU THEATRE */
+#curtain{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    display:flex;
+    z-index:999;
+}
+.panel{
+    width:50%;
+    height:100%;
+    background:#7b001c;
+    transition:transform 3s ease;
+}
+#curtain.open .left{
+    transform:translateX(-100%);
+}
+#curtain.open .right{
+    transform:translateX(100%);
+}
+
+/* BOITE DE JEU */
 #box{
-background:rgba(0,0,0,0.4);
-padding:20px;
-border-radius:15px;
-max-width:500px;
-margin:auto;
+    background: rgba(0,0,0,0.45);
+    padding:20px;
+    border-radius:15px;
+    max-width:500px;
+    margin:auto;
+    margin-top:20px;
+    backdrop-filter:blur(6px);
 }
-
 button{
-background:gold;
-border:none;
-padding:12px;
-width:100%;
-font-size:18px;
-margin-top:10px;
+    background:gold;
+    border:none;
+    padding:12px;
+    width:100%;
+    font-size:18px;
+    margin-top:10px;
+    border-radius:10px;
+    font-weight:bold;
+}
+input{
+    padding:10px;
+    font-size:18px;
+    width:100%;
+    border-radius:10px;
+    border:none;
+    margin-top:10px;
 }
 
+/* CHRONO */
+#chrono{
+    font-size:28px;
+    text-shadow:0 0 10px gold;
+}
+
+/* MASQUE ANIMÉ */
+#mask{
+    width:120px;
+    margin:auto;
+    animation:floatMask 3s ease-in-out infinite;
+}
+@keyframes floatMask{
+    0%{transform:translateY(0);}
+    50%{transform:translateY(-10px);}
+    100%{transform:translateY(0);}
+}
+
+/* FAUX STRESS VISUEL */
+@keyframes glitch{
+    0%{transform:translate(0);}
+    20%{transform:translate(-2px,2px);}
+    40%{transform:translate(2px,-2px);}
+    60%{transform:translate(-1px,1px);}
+    80%{transform:translate(1px,-1px);}
+    100%{transform:translate(0);}
+}
+.glitch{
+    animation:glitch 0.2s;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🎭 Carnaval Secret 🎭</h1>
+<!-- RIDEAU -->
+<div id="curtain">
+    <div class="panel left"></div>
+    <div class="panel right"></div>
+</div>
+
+<h1>🎭 Carnaval Mystérieux 🎭</h1>
+
+<img id="mask" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Venetian_mask.svg/512px-Venetian_mask.svg.png">
 
 <div id="start">
-
-<input id="teamName" placeholder="Nom équipe">
-
-<button onclick="start()">Entrer</button>
-
+    <input id="teamName" placeholder="Nom de l'équipe">
+    <button onclick="start()">Entrer au Bal</button>
 </div>
 
-<div id="game" style="display:none">
-
-<h2 id="chrono">00:00</h2>
-
-<div id="box">
-
-<p id="question"></p>
-
-<input id="rep">
-
-<button onclick="check()">Valider</button>
-
-<p id="msg"></p>
-
+<div id="game" style="display:none;">
+    <h2 id="chrono">00:00</h2>
+    <div id="box">
+        <p id="question"></p>
+        <input id="rep" placeholder="Mot secret">
+        <button onclick="check()">Valider</button>
+        <p id="msg"></p>
+    </div>
 </div>
 
-</div>
+<!-- MUSIQUE -->
+<audio id="music" loop>
+    <source src="https://cdn.pixabay.com/audio/2022/10/13/audio_39b6ff92bb.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-
-let enigmes=[
-{q:"Accessoire carnaval ?",r:"MASQUE"},
-{q:"Ville du carnaval ?",r:"VENISE"},
-{q:"Moment magique ?",r:"MINUIT"}
+// 🔥 ENIGMES
+let enigmes = [
+    {q:"Accessoire emblématique du carnaval ?", r:"MASQUE"},
+    {q:"Ville du célèbre carnaval ?", r:"VENISE"},
+    {q:"Moment magique où tout disparaît ?", r:"MINUIT"}
 ];
-
 enigmes.sort(()=>Math.random()-0.5);
 
-let sec=0;
-let timer;
-let index=0;
-let equipe="";
+let sec = 0, timer, index = 0, equipe = "";
 
+// START GAME
 function start(){
+    equipe = document.getElementById("teamName").value;
+    if(!equipe){ alert("Entrez un nom d'équipe"); return; }
 
-equipe=document.getElementById("teamName").value;
+    document.getElementById("curtain").classList.add("open");
 
-if(!equipe){alert("Nom équipe");return;}
+    // Musique sécurisée mobile
+    let music = document.getElementById("music");
+    music.muted=true;
+    music.play().then(()=>{music.muted=false;}).catch(()=>{});
 
-document.getElementById("start").style.display="none";
-document.getElementById("game").style.display="block";
+    document.getElementById("start").style.display="none";
+    document.getElementById("game").style.display="block";
 
-load();
+    // 🔥 Charger progression si existante
+    let prog = JSON.parse(localStorage.getItem("escapeProgress")||"{}");
+    if(prog[equipe]){
+        index = prog[equipe].index;
+        sec = prog[equipe].sec;
+    } else {
+        index = 0;
+        sec = 0;
+    }
 
-timer=setInterval(()=>{
-sec++;
-update();
-},1000);
+    load();
 
+    timer = setInterval(()=>{
+        sec++;
+        updateChrono();
+        randomStress();
+        // Sauvegarde progression
+        let p = JSON.parse(localStorage.getItem("escapeProgress")||"{}");
+        p[equipe] = {index:index, sec:sec};
+        localStorage.setItem("escapeProgress", JSON.stringify(p));
+    },1000);
 }
 
-function update(){
-
-let m=Math.floor(sec/60);
-let s=sec%60;
-
-document.getElementById("chrono").textContent=
-String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
-
+// CHRONO
+function updateChrono(){
+    let m=Math.floor(sec/60), s=sec%60;
+    document.getElementById("chrono").textContent=
+    String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
 }
 
+// CHARGER ENIGME
 function load(){
-
-document.getElementById("question").textContent=enigmes[index].q;
-
+    document.getElementById("question").textContent = enigmes[index].q;
+    document.getElementById("rep").value = "";
+    document.getElementById("msg").textContent = "";
 }
 
+// VERIFIER REPONSE
 function check(){
-
-let rep=document.getElementById("rep").value.toUpperCase();
-
-if(rep===enigmes[index].r){
-
-index++;
-
-if(index<enigmes.length){
-
-load();
-
-}else{
-
-finish();
-
+    let rep = document.getElementById("rep").value.toUpperCase();
+    if(rep === enigmes[index].r){
+        index++;
+        if(index < enigmes.length){ load(); }
+        else{ finish(); }
+    } else {
+        document.getElementById("msg").textContent = "❌ Mauvaise réponse";
+        document.body.classList.add("glitch");
+        setTimeout(()=>{document.body.classList.remove("glitch");},200);
+    }
 }
 
-}else{
-
-document.getElementById("msg").textContent="❌";
-
-}
-
-}
-
+// FIN DU JEU
 function finish(){
+    clearInterval(timer);
+    let temps = document.getElementById("chrono").textContent;
 
-clearInterval(timer);
+    // Sauvegarde résultat
+    let results = JSON.parse(localStorage.getItem("escapeResults")||"[]");
+    results.push({team:equipe,time:temps});
+    localStorage.setItem("escapeResults", JSON.stringify(results));
 
-let temps=document.getElementById("chrono").textContent;
+    // Supprime progression
+    let prog = JSON.parse(localStorage.getItem("escapeProgress")||"{}");
+    delete prog[equipe];
+    localStorage.setItem("escapeProgress", JSON.stringify(prog));
 
-/* SAUVEGARDE RESULTAT */
-let results=JSON.parse(localStorage.getItem("escapeResults")||"[]");
-
-results.push({team:equipe,time:temps});
-
-localStorage.setItem("escapeResults",JSON.stringify(results));
-
-document.body.innerHTML=`
-<h1>🎭 Terminé</h1>
-<h2>${temps}</h2>
-<p>Attendez le maître du jeu</p>
-`;
-
+    document.body.innerHTML=`
+        <h1>🎭 Mystère terminé !</h1>
+        <p>Temps final : ${temps}</p>
+        <p>Équipe : ${equipe}</p>
+        <p>Attendez l'annonce du Maître du Jeu</p>
+    `;
 }
 
-</script>
+// Faux stress visuel
+function randomStress(){
+    if(Math.random()<0.15){
+        document.body.classList.add("glitch");
+        setTimeout(()=>{document.body.classList.remove("glitch");},200);
+    }
+}
 
+// Mode maître du jeu (touche M)
+document.addEventListener("keydown",function(e){
+    if(e.key==="m"){
+        alert("😈 Mode Maître du Jeu activé");
+        finish();
+    }
+});
+</script>
 </body>
 </html>
+
