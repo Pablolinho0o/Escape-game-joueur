@@ -16,29 +16,6 @@ body{
     overflow:hidden;
 }
 
-/* RIDEAU THEATRE */
-#curtain{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    display:flex;
-    z-index:999;
-}
-.panel{
-    width:50%;
-    height:100%;
-    background:#7b001c;
-    transition:transform 3s ease;
-}
-#curtain.open .left{
-    transform:translateX(-100%);
-}
-#curtain.open .right{
-    transform:translateX(100%);
-}
-
 /* BOITE DE JEU */
 #box{
     background: rgba(0,0,0,0.45);
@@ -103,12 +80,6 @@ input{
 
 <body>
 
-<!-- RIDEAU -->
-<div id="curtain">
-    <div class="panel left"></div>
-    <div class="panel right"></div>
-</div>
-
 <h1>🎭 Carnaval Mystérieux 🎭</h1>
 
 <img id="mask" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Venetian_mask.svg/512px-Venetian_mask.svg.png">
@@ -148,8 +119,6 @@ let sec = 0, timer, index = 0, equipe = "";
 function start(){
     equipe = document.getElementById("teamName").value;
     if(!equipe){ alert("Entrez un nom d'équipe"); return; }
-
-    document.getElementById("curtain").classList.add("open");
 
     // Musique sécurisée mobile
     let music = document.getElementById("music");
@@ -251,4 +220,3 @@ document.addEventListener("keydown",function(e){
 </script>
 </body>
 </html>
-
