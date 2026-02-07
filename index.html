@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+
+body{
+background:linear-gradient(135deg,#2b0a3d,#6b1e4d,#b58a2c);
+color:white;
+font-family:Georgia;
+text-align:center;
+}
+
+#box{
+background:rgba(0,0,0,0.4);
+padding:20px;
+border-radius:15px;
+max-width:500px;
+margin:auto;
+}
+
+button{
+background:gold;
+border:none;
+padding:12px;
+width:100%;
+font-size:18px;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎭 Carnaval Secret 🎭</h1>
+
+<div id="start">
+
+<input id="teamName" placeholder="Nom équipe">
+
+<button onclick="start()">Entrer</button>
+
+</div>
+
+<div id="game" style="display:none">
+
+<h2 id="chrono">00:00</h2>
+
+<div id="box">
+
+<p id="question"></p>
+
+<input id="rep">
+
+<button onclick="check()">Valider</button>
+
+<p id="msg"></p>
+
+</div>
+
+</div>
+
+<script>
+
+let enigmes=[
+{q:"Accessoire carnaval ?",r:"MASQUE"},
+{q:"Ville du carnaval ?",r:"VENISE"},
+{q:"Moment magique ?",r:"MINUIT"}
+];
+
+enigmes.sort(()=>Math.random()-0.5);
+
+let sec=0;
+let timer;
+let index=0;
+let equipe="";
+
+function start(){
+
+equipe=document.getElementById("teamName").value;
+
+if(!equipe){alert("Nom équipe");return;}
+
+document.getElementById("start").style.display="none";
+document.getElementById("game").style.display="block";
+
+load();
+
+timer=setInterval(()=>{
+sec++;
+update();
+},1000);
+
+}
+
+function update(){
+
+let m=Math.floor(sec/60);
+let s=sec%60;
+
+document.getElementById("chrono").textContent=
+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+
+}
+
+function load(){
+
+document.getElementById("question").textContent=enigmes[index].q;
+
+}
+
+function check(){
+
+let rep=document.getElementById("rep").value.toUpperCase();
+
+if(rep===enigmes[index].r){
+
+index++;
+
+if(index<enigmes.length){
+
+load();
+
+}else{
+
+finish();
+
+}
+
+}else{
+
+document.getElementById("msg").textContent="❌";
+
+}
+
+}
+
+function finish(){
+
+clearInterval(timer);
+
+let temps=document.getElementById("chrono").textContent;
+
+/* SAUVEGARDE RESULTAT */
+let results=JSON.parse(localStorage.getItem("escapeResults")||"[]");
+
+results.push({team:equipe,time:temps});
+
+localStorage.setItem("escapeResults",JSON.stringify(results));
+
+document.body.innerHTML=`
+<h1>🎭 Terminé</h1>
+<h2>${temps}</h2>
+<p>Attendez le maître du jeu</p>
+`;
+
+}
+
+</script>
+
+</body>
+</html>

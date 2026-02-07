@@ -1,0 +1,25 @@
+<h1>🎭 RESULTATS</h1>
+
+<button onclick="show()">Afficher</button>
+
+<div id="res"></div>
+
+<script>
+
+function show(){
+
+let r=JSON.parse(localStorage.getItem("escapeResults")||"[]");
+
+r.sort((a,b)=>a.time.localeCompare(b.time));
+
+let html="";
+
+r.forEach(x=>{
+html+=x.team+" : "+x.time+"<br>";
+});
+
+document.getElementById("res").innerHTML=html;
+
+}
+
+</script>
