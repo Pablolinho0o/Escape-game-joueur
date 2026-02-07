@@ -6,21 +6,24 @@
 <title>Maître du Jeu - Carnaval Mystérieux</title>
 <style>
 body{
-    font-family:Georgia, serif;
-    text-align:center;
-    background:linear-gradient(135deg,#2b0a3d,#6b1e4d,#b58a2c);
-    color:white;
+margin:0;
+font-family:Georgia, serif;
+text-align:center;
+color:black;
+background:url('images/fond.png') no-repeat center center fixed;
+background-size:cover;
+overflow:hidden;
 }
 button{
     background:gold;
     border:none;
     padding:12px 20px;
     font-size:18px;
-    margin-top:10px;
+    margin:5px;
     border-radius:10px;
     font-weight:bold;
 }
-#res{
+#res, #answers{
     margin-top:20px;
     font-size:20px;
 }
@@ -28,46 +31,90 @@ button{
 </head>
 <body>
 
-<h1>🎭 Maître du Jeu - Classement</h1>
+<h1>🎭 Maître du Jeu</h1>
 
-<button onclick="show()">Afficher le classement</button>
+<button onclick="showRanking()">Afficher le classement</button>
+<button onclick="showCorrectAnswers()">Voir les réponses correctes</button>
 <button onclick="resetAll()">Réinitialiser les résultats</button>
 
 <div id="res"></div>
+<div id="answers"></div>
 
 <script>
-// Afficher le classement
-function show(){
-    let r = JSON.parse(localStorage.getItem("escapeResults")||"[]");
-    if(r.length===0){
+
+// Réponses correctes aux énigmes
+const correctAnswers = [
+    "ADÈLE EXARCHOPOULOS",
+    "MASQUE",
+    "HAMBURGER",
+    "SABRINA",
+    "LE BAC",
+    "19/01/1994",
+    "DARIO" // énigme finale
+];
+
+// Afficher classement
+function showRanking(){
+
+    let r = JSON.parse(localStorage.getItem("escapeResults") || "[]");
+
+    if(r.length === 0){
         document.getElementById("res").innerHTML = "<p>Aucun résultat enregistré</p>";
         return;
     }
-    // Trier par temps croissant (plus rapide = premier)
-    r.sort((a,b)=> {
+
+    // Trier par temps (plus rapide en premier)
+    r.sort((a,b)=>{
+
         let [ma,sa] = a.time.split(':').map(Number);
         let [mb,sb] = b.time.split(':').map(Number);
+
         return (ma*60+sa) - (mb*60+sb);
+
     });
 
     let html="<ol>";
+
     r.forEach(x=>{
         html += `<li>${x.team} : ${x.time}</li>`;
     });
+
     html += "</ol>";
 
     document.getElementById("res").innerHTML = html;
 }
 
-// Réinitialiser tous les résultats
+// Voir réponses
+function showCorrectAnswers(){
+
+    let html="<h2>Réponses correctes aux énigmes</h2><ol>";
+
+    correctAnswers.forEach((a,i)=>{
+        html += `<li>Question ${i+1} : <b>${a}</b></li>`;
+    });
+
+    html += "</ol>";
+
+    document.getElementById("answers").innerHTML = html;
+}
+
+// Reset
 function resetAll(){
+
     if(confirm("Voulez-vous vraiment supprimer tous les résultats ?")){
+
         localStorage.removeItem("escapeResults");
         localStorage.removeItem("escapeProgress");
+
         document.getElementById("res").innerHTML="";
+        document.getElementById("answers").innerHTML="";
+
         alert("Résultats réinitialisés !");
+
     }
+
 }
+
 </script>
 
 </body>
